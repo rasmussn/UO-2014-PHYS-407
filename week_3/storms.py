@@ -19,37 +19,59 @@ def line_to_dict(line):
    return d
 # end line_to_dict
 
+def dict_to_list(d):
+   '''place values in dictionary into a list in the correct order'''
 
-import sys
-import argparse
-import storms
+   l = []
+   l.append(d['id'])
+   l.append(d['name'])
+   l.append(d['lat'])
+   l.append(d['long'])
+   l.append(d['speed'])
+   l.append(d['pressure'])
+   l.append(d['year'])
+   l.append(d['hours'])
+   l.append(d['desc'])
 
-## get input file name
-#
-parser = argparse.ArgumentParser(description='Process csv file.')
-parser.add_argument("-i", dest="infile",  help="input file name")
-parser.add_argument("-o", dest="outfile", help="output file name")
-args = parser.parse_args()
+   return l
+# end disc_to_line
 
-infile  = sys.stdin
-outfile = sys.stdout
 
-if args.infile:   infile = open(args.infile,  'r')
-if args.outfile: outfile = open(args.outfile, 'w')
+'''
+This is run only if called directly by python
+and not imported as a module.
+'''
+if __name__ == "__main__":
 
-## list data structure for storm data
-#
-storm_list = []
+   import sys
+   import argparse
 
-for line in infile:
-   dict_entry = storms.line_to_dict(line)
-   storm_list.append(storms.line_to_dict(line))
+   ## get input file name
+   #
+   parser = argparse.ArgumentParser(description='Process csv file.')
+   parser.add_argument("-i", dest="infile",  help="input file name")
+   parser.add_argument("-o", dest="outfile", help="output file name")
+   args = parser.parse_args()
 
-for d in storm_list:
-    outfile.write(str(d) + '\n')
+   infile  = sys.stdin
+   outfile = sys.stdout
 
-## close open files
-#
-if args.infile:   infile.close()
-if args.outfile: outfile.close()
+   if args.infile:   infile = open(args.infile,  'r')
+   if args.outfile: outfile = open(args.outfile, 'w')
+
+   ## list data structure for storm data
+   #
+   storm_list = []
+
+   for line in infile:
+      storm_list.append(line_to_dict(line))
+
+   for d in storm_list:
+      l = dict_to_list(d)
+      outfile.write(str(l) + ',' + '\n')
+
+   ## close all open files
+   #
+   if args.infile:   infile.close()
+   if args.outfile: outfile.close()
 
