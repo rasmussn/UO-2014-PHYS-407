@@ -12,3 +12,6 @@ check : to_csv
 
 clean :
 	rm -f to_csv *.o *.mod *.pyc
+	
+	unmake this stuff
+	
