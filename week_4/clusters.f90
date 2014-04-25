@@ -27,7 +27,7 @@ subroutine counter(data, lat, long, dLat, dLong, begin_year, end_year, threshold
                    subset)
    implicit none
    type(quake) :: data(:)
-   type(quake), allocatable :: subset(:)
+   type(quake), allocatable :: subset(:), tmp(:)
    integer :: begin_year, end_year
    real :: lat, long, dLat, dLong, threshold
 
@@ -39,40 +39,40 @@ subroutine counter(data, lat, long, dLat, dLong, begin_year, end_year, threshold
    !
    len_data = shape(data)
 
+   ! allocate temporary storage big enough to store all values
+   !
+   allocate(tmp(len_data(1)))
+
    ! first we have to find the size of the data subset
    !
    count = 0
    do i = 1, len_data(1)
-      if (data(i)%year < begin_year)       continue
-      if (data(i)%year > end_year)         continue
-      if (data(i)%lat  < lat - dLat/2.)    continue
-      if (data(i)%lat  > lat + dLat/2.)    continue
-      if (data(i)%long < long - dLong/2.)  continue
-      if (data(i)%long > long + dLong/2.)  continue
-      if (data(i)%magnitude < threshold)   continue
+      if (data(i)%year < begin_year)       go to 10
+      if (data(i)%year > end_year)         go to 10
+      if (data(i)%lat  < lat - dLat/2.)    go to 10
+      if (data(i)%lat  > lat + dLat/2.)    go to 10
+      if (data(i)%long < long - dLong/2.)  go to 10
+      if (data(i)%long > long + dLong/2.)  go to 10
+      if (data(i)%magnitude < threshold)   go to 10
 
       ! found an event, count it
       count = count + 1
+      tmp(count) = data(i)
+
+10    continue
+
    end do
 
-   ! now we know the size, allocate memory for the data subset
+   ! now we know the size, allocate memory for the data subset and copy
    !
    allocate(subset(count))
-
-   count = 0
-   do i = 1, len_data(1)
-      if (data(i)%year < begin_year)       continue
-      if (data(i)%year > end_year)         continue
-      if (data(i)%lat  < lat - dLat/2.)    continue
-      if (data(i)%lat  > lat + dLat/2.)    continue
-      if (data(i)%long < long - dLong/2.)  continue
-      if (data(i)%long > long + dLong/2.)  continue
-      if (data(i)%magnitude < threshold)   continue
-
-      ! found an event, add it to the data subset
-      count = count + 1
-      subset(count) = data(i)
+   do i = 1, count
+      subset(i) = tmp(i)
    end do
+
+   ! deallocate temporary storage
+   !
+   deallocate(tmp)
 
 end subroutine counter
 
@@ -86,16 +86,39 @@ program main
    type(quake) :: quakes(MAX_SIZE)
    type(quake), allocatable :: subset(:)
 
-   integer :: begin_year, end_year
-   real :: lat, long, dLat, dLong, threshold
+   integer :: year, begin_year, end_year, funit, i, len_data(1)
+   real :: dLat, dLong, threshold
   
-   !! first read in the data (not shown)
+   character(len=*), parameter :: fmt = "(12x, i4, f7.1, f10.3, f7.1, f5.1)"
+
+   !! first open data file
    !
+   funit = 13
+   open(UNIT=funit, FILE="quake.txt", ACTION="READ")
 
-   call counter(quakes, lat, long, dLat, dLong, begin_year, end_year, threshold, subset)
+   !! read in the data
+   !
+   do i = 1, MAX_SIZE
+      read(UNIT=funit, FMT=fmt, END=20) quakes(i)%year, quakes(i)%lat, quakes(i)%long, quakes(i)%depth, quakes(i)%magnitude
+   end do
 
-   !! free allocated memory
+20 continue
+
+   dLat  = 2.9
+   dLong = 4.3
+   threshold = 1
+   call counter(quakes, seaLat, seaLong, dLat, dLong, 1900, 2010, threshold, subset)
+
+   ! get the length of the array
+   !
+   len_data = shape(subset)
+   do i = 1, len_data(1)
+      print *, subset(i)
+   end do
+
+   !! free allocated memory and close file
    !
    deallocate(subset)
+   close(funit)
 
 end program
