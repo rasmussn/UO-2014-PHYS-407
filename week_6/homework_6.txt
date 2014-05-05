@@ -1,0 +1,32 @@
+Sixth Exercise: Advection, numerical solution of a simple wave equation.  Due by 10 pm on Thursday May 8.
+
+This assignment is a welcome break from analyzing data and will finally give you a chance to model the real world and not just to look at it.  Waves are a common occurence in nature and appear as surface waves on the ocean for example (go surfer) and are associated with virtually everything around us (music, vision, earthquakes, tornadoes, solar flares, planetary magnetospheres, ...).  Wave-like solutions arise from the solution of hyperbolic partial differential equations.
+
+In this exercise you will be expected to write a program to solve the continuity equation (mass conservation) using information contained in the manual for the Pagosa code (see http://library.lanl.gov/cgi-bin/getfile?LA-14425-M.pdf).  All equations and figures referenced in this exercise are from this manual.  You should submit your program along with several graphs as outlined in the steps below.
+
+The governing equation is the one dimensional form of (4.1).  In this exercise we will assume a constant velocity in space and time so the divergence of the velocity in (4.1) is zero.
+
+1. Create a one-dimensional Eulerian grid as outlined in chapter 2 of the Pagosa manual.  The velocity U is defined at the vertices of the cell while the mass density R (rho) is a cell-centered quantity.  You should use the following to create the grid and initialize the arrays R and U:
+
+   N   = 32           # number of interior cells
+   nh  = 1            # number of halo cells on each side of the spatial domain
+   u0  = 1.0          # constant velocity > 0
+   dx  = 1.0          # cell width
+   dt  = 0.5          # time step is 1/2 of dx/u0
+   nt  = 32           # number of time steps
+
+Try to implement cyclic boundary conditions by updating each halo cell with information from the opposite boundary at each time step.  If you run into difficulty doing this it is ok to create a much bigger grid to allow any pulses to travel without encountering a boundary (although it will be difficult to complete parts 3 and 5 with cyclic boundary conditions).
+
+2. Use operator splitting (4.6) to implement both a Lagrangian phase (4.1) and an advective phase (4.16).  However since U is constant (for now), the Lagragian function is just a noop.  Use equation 4.41 (U>0) to implement the advection phase with fluxes obtained from (4.42) using the first order method (4.43a).  The exact solution of the advection stage is given by (4.39), see Figure 4.4 (extra credit will be given if you plot the points from the exact solution along with your numerical solution).
+
+a. The initial conditions are R[0:15] = 1.0 and zero elsewhere.  Submit two plots: one showing your initial conditions and the other showing the solution 32 time steps later.  Based on the description of the first-order method, what do you think is causing the poor results?
+
+b. Submit another plot at 16 time steps with dt = 1.0.  Explain in terms of the Courant condition why these results are magically better.
+
+3. Repeat 2a with a sinusoid for initial conditions rather than a box.  Let the domain of the interior range from 0 to 2*pi.  Submit two plots as before.  Can you give an explanation as to why the sinusoid is bettor approximated by the first-order method?
+
+4. Repeat 2 using the second-order method from equation 4.43b.  Don't limit the fluxes according to (4.44).
+
+5. Repeat 3 using the second-order method, again without the flux limiter.
+
+6. Given what you've learned so far, would you use a first, second, or third order method to model a shock problem?
