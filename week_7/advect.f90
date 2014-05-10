@@ -4,7 +4,7 @@ module advection
 
    !! initialize constants
    !
-   integer, parameter ::   N   = 32           ! number of interior cells
+   integer, parameter ::   N   = 16           ! number of interior cells
    integer, parameter ::   NH  = 2            ! number of halo cells on each side of the spatial domain
    integer, parameter ::   nt  = 32           ! number of time steps
    real,    parameter ::   u0  = 1.0          ! constant velocity > 0
@@ -189,7 +189,7 @@ program advect
    call initialize_box()
    print *, 0, "Total mass is", sum(Rho(0:N-1))
 
-   do t = 1, nt/2
+   do t = 1, nt
       ! no need for Lagrangian phase in this assignment as no dU/dx
       call advect_third_order()
       print *, t, "Total mass is", sum(Rho(0:N-1))
