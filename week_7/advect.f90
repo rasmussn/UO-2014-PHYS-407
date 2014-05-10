@@ -4,9 +4,9 @@ module advection
 
    !! initialize constants
    !
-   integer, parameter ::   N   = 16           ! number of interior cells
+   integer, parameter ::   N   = 32           ! number of interior cells
    integer, parameter ::   NH  = 2            ! number of halo cells on each side of the spatial domain
-   integer, parameter ::   nt  = 32           ! number of time steps
+   integer, parameter ::   nt  = 16           ! number of time steps
    real,    parameter ::   u0  = 1.0          ! constant velocity > 0
    real,    parameter ::   dx  = 1.0          ! cell width
    real,    parameter ::   dt  = 0.5          ! time step is 1/2 of dx/u0
@@ -27,7 +27,7 @@ subroutine initialize_box()
 
    call set_periodic_boundaries()
 
-end subroutine
+end subroutine initialize_box
 
 subroutine initialize_sin()
    implicit none
@@ -42,7 +42,7 @@ subroutine initialize_sin()
 
    call set_periodic_boundaries()
 
-end subroutine
+end subroutine initialize_sin
 
 subroutine set_periodic_boundaries()
    implicit none
@@ -52,7 +52,7 @@ subroutine set_periodic_boundaries()
    Rho(N)     = Rho(0)        ! right boundary cells equals left- most interior cells
    Rho(N+1)   = Rho(1)        ! right boundary cells equals left- most interior cells
 
-end subroutine
+end subroutine set_periodic_boundaries
 
 subroutine output_variables()
    implicit none
@@ -63,7 +63,7 @@ subroutine output_variables()
       write(*,*) i, Rho(i)
    end do
    
-end subroutine
+end subroutine output_variables
 
 subroutine advect_first_order
    implicit none
@@ -87,7 +87,7 @@ subroutine advect_first_order
    Rho = Tmp    ! finished with temporary storage
    call set_periodic_boundaries()
 
-end subroutine
+end subroutine advect_first_order
 
 subroutine advect_second_order
    implicit none
@@ -109,7 +109,7 @@ subroutine advect_second_order
    Rho = Tmp    ! finished with temporary storage
    call set_periodic_boundaries()
 
-end subroutine
+end subroutine advect_second_order
 
 subroutine advect_third_order
    implicit none
@@ -176,7 +176,7 @@ subroutine advect_third_order
    Rho = Tmp    ! finished with temporary storage
    call set_periodic_boundaries()
 
-end subroutine
+end subroutine advect_third_order
 
 end module advection
 
