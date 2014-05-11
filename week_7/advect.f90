@@ -111,6 +111,27 @@ subroutine advect_second_order
 
 end subroutine advect_second_order
 
+!!!!!
+! return the sign of the flux limiter
+!
+pure real function flux_limiter_sign(upw, dnw)
+   real, intent(in) :: upw, dnw
+   real :: s   
+
+   if (upw*dnw <= 0.0) then
+      s = 0.0
+   else
+      if (upw > 0.0) then
+         s = +1.0
+      else
+         s = -1.0
+      end if
+   end if
+
+   flux_limiter_sign = s
+
+end function flux_limiter_sign
+
 subroutine advect_third_order
    implicit none
    integer :: i
@@ -132,17 +153,7 @@ subroutine advect_third_order
       upw = Rho(i)   - Rho(i-1)      ! upwind   gradient
       dnw = Rho(i+1) - Rho(i)        ! downwind gradient
 
-      ! calculate sign of flux limiter
-      !
-      if (upw*dnw <= 0.0) then
-         s = 0.0
-      else
-         if (upw > 0.0) then
-            s = +1.0
-         else
-            s = -1.0
-         end if
-      end if
+      s = flux_limiter_sign(upw, dnw)
 
       upw = abs(upw)
       dnw = abs(dnw)
@@ -154,17 +165,7 @@ subroutine advect_third_order
       upw = Rho(i-1) - Rho(i-2)      ! upwind   gradient
       dnw = Rho(i  ) - Rho(i-1)      ! downwind gradient
 
-      ! calculate sign of flux limiter
-      !
-      if (upw*dnw <= 0.0) then
-         s = 0.0
-      else
-         if (upw > 0.0) then
-            s = +1.0
-         else
-            s = -1.0
-         end if
-      end if
+      s = flux_limiter_sign(upw, dnw)
 
       upw = abs(upw)
       dnw = abs(dnw)
