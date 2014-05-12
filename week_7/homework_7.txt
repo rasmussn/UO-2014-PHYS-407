@@ -1,0 +1,26 @@
+Seventh Exercise: Advection, part deux.  Due by 10 pm on Thursday May 15.
+
+This assignment should be short to allow you time to start work on your class projects.  The assignment MUST be done individually; no pairing up this time.
+
+1. Based on the Fortran program, week_6/advect.f90, in the class git repository, do the following:
+
+Fix your homework from last week.  You only need to submit the results from the week 6 assignment, part 2a.  If you code in Python, the Fortran example should provide useful tips and allow you to start to understand a little about the Fortran language.
+
+2. Run the Fortran program, week_7/advect.f90, on ACISS. Copy back the results to your computer and plot the results.  Notice that the third-order method with a flux limiter does a much better job of advecting a square pulse.  The flux limiter is constructed in such a way so as to maximize spatial gradients WITHOUT allowing nonphysical results (negative dentities).
+
+You should modify the file, week_7/run_advect.pbs, to change that text to represent your own email and run directory structure.  There is also a file, week_7/load_modules.sh, that you can source to set up your environment for compilation.  Compilation should be done on node hn2 so you will need to source the load_modules.sh file there, for example,
+
+     ssh hn2                  # from the ACISS head node
+     source load_modules.sh   # check loaded modules with "module list"
+
+You submit the file with the command
+
+     qsub run_advect.pbs
+
+and you can check the status of the run with the qstat command.
+
+You will need to use the scp command to copy files to and from ACISS.  I suggest you run the scp command from your local computer, for example,
+
+    scp file_name your_login_name@aciss.uoregon.edu:file_name
+
+Good luck!
