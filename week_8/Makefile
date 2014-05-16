@@ -8,7 +8,7 @@ mpi_ring : mpi_ring.f90
 check : mpi_ring
 	@echo "Running mpi_ring ..."
 	@echo
-	@mpirun -np 1 mpi_ring
+	@mpirun -np 2 mpi_ring
 
 clean :
 	rm -f *.pyc *.o *.mod mpi_ring
