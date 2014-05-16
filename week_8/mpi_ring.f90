@@ -8,9 +8,13 @@
 program main
     use mpi
     implicit none
-    integer, parameter :: tag = 201
-    integer :: rank, size, next, prev, err
-    integer :: i, message(1)
+    double precision :: t1, t2
+    integer :: t, rank, size, left, right, err
+    real    :: boundary(1)
+
+    integer, parameter :: nt  = 3           ! number of time steps
+    integer, parameter :: sleep_sec = 5     ! number of seconds to sleep
+    integer, parameter :: tag = 201         ! for MPI matching, number unimportant
 
     ! Start up MPI
 
@@ -19,53 +23,47 @@ program main
     call MPI_Comm_rank(MPI_COMM_WORLD, rank, err)
     call MPI_Comm_size(MPI_COMM_WORLD, size, err)
  
-    ! Calculate the rank of the next process in the ring.  Use the
+    ! Calculate the rank of the process to the right in the ring.  Use the
     !   modulus operator so that the last process "wraps around" to
-    !   rank zero.
+    !   rank zero (periodic boundary conditions).
 
-    next = modulo(rank + 1, size)
-    prev = modulo(rank + size - 1, size)
-
-    ! If we are the "master" process (i.e., MPI_COMM_WORLD rank 0),
-    !   put the number of times to go around the ring in the
-    !   message.
+    right = modulo(rank + 1, size)
+    left = modulo(rank + size - 1, size)
 
     if (rank == 0) then
-        message(1) = 5
-
+        t1 = MPI_Wtime()
         print *, "Process 0, ", size, "processes in ring"
-        print *, "Process 0 sending", message(1), "to", next
-        
-        call MPI_Send(message, 1, MPI_INTEGER, next, tag, MPI_COMM_WORLD)
-    end if
+        print *
+     end if
 
-    ! Pass the message around the ring.  The exit mechanism works as
-    !   follows: the message (a positive integer) is passed around the
-    !   ring.  Each time it passes rank 0, it is decremented.  When
-    !   each processes receives a message containing a 0 value, it
-    !   passes the message on to the next process and then quits.  By
-    !   passing the 0 message first, every process gets the 0 message
-    !   and can quit normally. */
+    ! Perform the time advance loop
+    !
+    do t = 1, 2
+        boundary(1) = 10*rank   ! you need to set an appropriate boundary condition
+        call MPI_Send(boundary, 1, MPI_REAL, right, tag, MPI_COMM_WORLD, err)
+        print *, "Process", rank, "sent    ", boundary(1), "to  ", right
 
-    message(1) = 1
-    do while (message(1) > 0)
-        call MPI_Recv(message, 1, MPI_INTEGER, prev, tag, MPI_COMM_WORLD, err)
-        print *, "Process", rank, "received", message(1)
-        if (rank == 0) then
-            message(1) = message(1) - 1
-        end if
+        call MPI_Recv(boundary, 1, MPI_REAL, left, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE, err)
+        print *, "Process", rank, "received", boundary(1), "from", left
 
-        call MPI_Send(message, 1, MPI_INTEGER, next, tag, MPI_COMM_WORLD)
-        if (message(1) == 0) then
-            print *, "Process", rank, "exiting"
-        end if
+        !
+        ! Perform wave propagation using new information from left
+        !   just sleep for now.  Since work per process shrinks as
+        !   processes are added, divide by work size.
+        !
+        call sleep(sleep_sec/size)
+
+        if (rank == 0) print *
+
     end do
 
-    ! The last process does one extra send to process 0, which needs
-    !   to be received before the program can exit
+    call MPI_Barrier(MPI_COMM_WORLD, err)
 
     if (rank == 0) then
-        call MPI_Recv(message, 1, MPI_INTEGER, prev, tag, MPI_COMM_WORLD, err)
+        t2 = MPI_Wtime()
+
+        print *, "elapse time:", 1000*REAL(t2-t1), "ms"
+        print *
     end if
     
     ! All done
