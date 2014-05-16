@@ -57,6 +57,8 @@ program main
 
     end do
 
+    ! Make sure everyone has finished before doing I/O (input/output)
+    !
     call MPI_Barrier(MPI_COMM_WORLD, err)
 
     if (rank == 0) then
