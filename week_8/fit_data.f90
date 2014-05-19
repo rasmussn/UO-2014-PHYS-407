@@ -4,7 +4,7 @@ module fit_data_mod
 
    !! setup parameters, you may need to modify these
    !
-   integer, parameter :: numIterations = 1000                 ! number of random searches
+   integer, parameter :: numIterations = 10000                ! number of random searches per process
 
    real, parameter :: xStepMin  =  200,  xStepMax  =  300     ! time step
    real, parameter :: xSlopeMin =    2,  xSlopeMax =    3     ! slope of linear fit
@@ -89,9 +89,6 @@ subroutine randomize()
    call random_number(a)          ! phase
    a = aMin + (aMax - aMin)*a
 
-!   call random_number(dPhi)
-!   dPhi = dPhiMin + (dPhiMax - dPhiMin)*dPhi
-
 end subroutine randomize
 
 end module fit_data_mod
@@ -156,13 +153,13 @@ program fit_data
          resid = (ykk - yy(i))
          resid = (resid*resid)/yy(i)
          chi = chi + resid
-         !write(out_unit,*) xx(i), ykk
       end do
 
       chisq = chi/600
       chi = 0
       if (chisq .lt. chimin) then
-         write(*,*) chimin, slope, a, p, iter, rank
+         write(*,*) rank, iter, chimin, slope, a, p
+         write(out_unit,'(2i4, 7f8.2, f10.2)') rank, iter, chimin, slope, a, p, phi, phi1, xstep, zp
          chimin = chisq
       end if
    end do
