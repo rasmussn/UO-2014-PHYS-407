@@ -1,14 +1,17 @@
 FC = mpif90
 
-all : mpi_ring
+all : fit_data
+
+fit_data : fit_data.f90
+	$(FC) -o fit_data fit_data.f90
 
 mpi_ring : mpi_ring.f90
 	$(FC) -o mpi_ring mpi_ring.f90
 
-check : mpi_ring
-	@echo "Running mpi_ring ..."
+check : fit_data
+	@echo "Running fit_data ..."
 	@echo
-	@mpirun -np 2 mpi_ring
+	@mpirun -np 1 fit_data
 
 clean :
-	rm -f *.pyc *.o *.mod mpi_ring
+	rm -f *.o *.mod fit_data mpi_ring
