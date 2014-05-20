@@ -4,9 +4,7 @@ module fit_data_mod
 
    !! setup parameters, you may need to modify these
    !
-   integer, parameter :: numIterations = 10000                ! number of random searches per process
-
-   real, parameter :: xStepMin  =  200,  xStepMax  =  300     ! time step
+   real, parameter :: xStepMin  =  200,  xStepMax  =  300     ! phase time step
    real, parameter :: xSlopeMin =    2,  xSlopeMax =    3     ! slope of linear fit
    real, parameter :: zpMin     = 7600,  zpMax     = 7800     ! zero point
    real, parameter :: pMin      =   50,  pMax      =   60     ! period
@@ -17,12 +15,13 @@ module fit_data_mod
 
    !! module variables
    !
-   real :: xstep         ! time step
-   real :: slope         ! slope
-   real :: zp            ! zero point
-   real :: p             ! period
-   real :: phi, phi1     ! phases
-   real :: a             ! amplitude
+   integer :: numIterations   ! number of random searches per process
+   real :: xstep              ! time step
+   real :: slope              ! slope
+   real :: zp                 ! zero point
+   real :: p                  ! period
+   real :: phi, phi1          ! phases
+   real :: a                  ! amplitude
 
    real :: xx(MAX_SIZE), yy(MAX_SIZE)
 
@@ -68,7 +67,7 @@ subroutine randomize()
    implicit none
    real :: r
 
-   call random_number(xstep)      ! uniformly distributed on interal [0.0, 1.0)
+   call random_number(xstep)      ! uniformly distributed on internal [0.0, 1.0)
    xstep = xStepMin + (xStepMax - xStepMin)*xstep
 
    call random_number(slope)      ! slope
@@ -98,6 +97,7 @@ program fit_data
    use mpi
    use fit_data_mod
    implicit none
+   character(len=32) :: arg
    integer :: i, err, iter, seed(12), rank, size, out_unit
    real :: chi, chimin, chisq, resid, sk, yk, ykk
 
@@ -108,25 +108,39 @@ program fit_data
    call MPI_Comm_rank(MPI_COMM_WORLD, rank, err)
    call MPI_Comm_size(MPI_COMM_WORLD, size, err)
 
-   if (rank == 0) then
-      print *, "Running MPI with size of", size
+   !! get number of iterations from the command line
+   !
+   call get_command_argument(1, arg)
+   read(arg, '(i12)') numIterations
+
+   if (len_trim(arg) == 0) then
+      if (rank == 0) then
+         print *, 'usage: fit_data num_iterations'
+         print *, '       please input # interations as a command line argument'
+         print *
+      end if
+      call MPI_Finalize(err)
+      stop
    end if
 
    call read_data()
    call smooth_data()
 
    if (rank == 0) then
-      write(*,*) 'Going to work on the first 600 data points'
-      write(*,*) 'fitting line + sin wave + phase adjustement at later time steps'
-      write(*,*) 'From class for initial values'
-      write(*,*) 'slope = 2.8 (slope)'
-      write(*,*) 'zeropoint = 7700 (zp)'
-      write(*,*) 'period = 54 (p)'
-      write(*,*) 'amplitude = 300 (a)'
-      write(*,*) 'phase = -7 (phi)'
-      write(*,*) 'phase1 = 2 (phi1)'
-      write(*,*) 'timestep = 250 (xstep)'
-      write(*,*)
+      print *, "Running MPI with size of", size
+      print *, "Number of iterations is ", numIterations
+      print *
+      ! write(*,*) 'Going to work on the first 600 data points'
+      ! write(*,*) 'fitting line + sin wave + phase adjustement at later time steps'
+      ! write(*,*) 'From class for initial values'
+      ! write(*,*) 'slope = 2.8 (slope)'
+      ! write(*,*) 'zeropoint = 7700 (zp)'
+      ! write(*,*) 'period = 54 (p)'
+      ! write(*,*) 'amplitude = 300 (a)'
+      ! write(*,*) 'phase = -7 (phi)'
+      ! write(*,*) 'phase1 = 2 (phi1)'
+      ! write(*,*) 'timestep = 250 (xstep)'
+      ! write(*,*)
    end if
 
    ! Initialize random number generator to something based on MPI rank so
@@ -136,7 +150,7 @@ program fit_data
    seed = (rank + 1)*seed           ! some modification based on the MPI rank
    call random_seed(put=seed)
 
-   out_unit = 22 + rank    ! files must be different for each MPI rank
+   out_unit = 21 + rank    ! files must be different for each MPI rank
    chimin = 50
 
    do iter = 1, numIterations
@@ -159,7 +173,7 @@ program fit_data
       chi = 0
       if (chisq .lt. chimin) then
          write(*,*) rank, iter, chimin, slope, a, p
-         write(out_unit,'(2i4, 7f8.2, f10.2)') rank, iter, chimin, slope, a, p, phi, phi1, xstep, zp
+         write(out_unit,'(i3,1x,i9,7f8.2,f10.2)') rank, iter, chimin, slope, a, p, phi, phi1, xstep, zp
          chimin = chisq
       end if
    end do

@@ -11,7 +11,7 @@ mpi_ring : mpi_ring.f90
 check : fit_data
 	@echo "Running fit_data ..."
 	@echo
-	@mpirun -np 1 fit_data
+	@mpirun -np 1 fit_data 1000
 
 clean :
 	rm -f *.o *.mod fit_data mpi_ring
