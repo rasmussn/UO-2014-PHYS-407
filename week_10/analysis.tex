@@ -24,12 +24,25 @@
 \noindent Now try to add (1) and (2) and subtract $2f(x_i)$:
 
 \begin{equation}
- f(x_{i+1}) - 2f(x_i) + f(x_{i-1}) = \frac{1}{2}h^2 f^{\prime\prime}(x_i) + \frac{1}{2}h^2 f^{\prime\prime}(x_i) = h^2 f^{\prime\prime}(x_i)
+ f(x_{i+1}) - 2f(x_i) + f(x_{i-1}) = \frac{1}{2}h^2 f^{\prime\prime}(x_i) + \frac{1}{2}h^2 f^{\prime\prime}(x_i) = h^2 f^{\prime\prime}(x_i) + err(0(h^3))
  \end {equation}
  
  \begin{equation}
-  f^{\prime\prime}(x_i) = \frac{f(x_{i+1}) - 2f(x_i) + f(x_{i-1})}{h^2}
+  f^{\prime\prime}(x_i) = \frac{f(x_{i+1}) - 2f(x_i) + f(x_{i-1})}{h^2} + err(0(h^3))
  \end {equation}
+  
+ \noindent Poisson's equation --- Laplace's equation
+ 
+ \begin{equation}
+ \frac {\partial^2 f(x)}{\partial x^2} = 4\pi\rho = 0
+  \end {equation}
+  
+ \noindent Solve (6) for $f(x_i)$ (Relaxation/Iterative Method)
+ 
+ \begin{equation}
+ f(x_i) = \frac{f(x_{i+1}) + f(x_{i-1})}{2} + err(0(h^3))
+  \end {equation}
+  
   
 \end{document}
 
