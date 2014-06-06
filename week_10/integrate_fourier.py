@@ -19,6 +19,16 @@ if __name__ == "__main__":
    err = np.zeros(N)
 
    '''
+     plot source function
+   '''
+   dx = 2*pi/N
+   x = np.arange(N) * dx
+   y = source_fourier(x)
+
+   plt.plot(x, y, "bo")
+   plt.show()
+
+   '''
      simple sum (zeroth order method)
    '''
    for n in range(1,N+1):
