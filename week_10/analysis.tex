@@ -17,11 +17,19 @@
  f(x_{i+1}) - f(x_{i-1}) = 2hf^{\prime}(x_i) + err(0(h^3))
 \end {equation}
 
-\noindent Now try to add (1) and (2) and subtract $2x_i$:
-
 \begin{equation}
  f^{\prime}(x_i) = \frac{1}{2h}[f(x_{i+1}) - f(x_{i-1})] + err(0(h^3))
  \end {equation}
 
+\noindent Now try to add (1) and (2) and subtract $2f(x_i)$:
+
+\begin{equation}
+ f(x_{i+1}) - 2f(x_i) + f(x_{i-1}) = \frac{1}{2}h^2 f^{\prime\prime}(x_i) + \frac{1}{2}h^2 f^{\prime\prime}(x_i) = h^2 f^{\prime\prime}(x_i)
+ \end {equation}
+ 
+ \begin{equation}
+  f^{\prime\prime}(x_i) = \frac{f(x_{i+1}) - 2f(x_i) + f(x_{i-1})}{h^2}
+ \end {equation}
+  
 \end{document}
 
