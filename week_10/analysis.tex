@@ -11,11 +11,13 @@
  f(x_{i-1}) = f(x_i) + (x_{i-1} - x_i) f^{\prime}(x_i) + \frac{1}{2}(x_{i-1} - x_i)^2 f^{\prime\prime}(x_i) + err(0(h^3))
 \end {equation}
 
-For fun(!) subtract equation (2) and (1), recalling that $h = x_{i+1} - x_i$, ...:
+\noindent For fun(!) subtract equation (2) from (1), recalling that $h = x_{i+1} - x_i$, ...:
 
 \begin{equation}
- f(x_{i+1}) - f(x_{i-1}) = 2hf^{\prime}(x_i)
+ f(x_{i+1}) - f(x_{i-1}) = 2hf^{\prime}(x_i) + err(0(h^3))
 \end {equation}
+
+\noindent Now try to add (1) and (2) and subtract $2x_i$:
 
 \begin{equation}
  f^{\prime}(x_i) = \frac{1}{2h}[f(x_{i+1}) - f(x_{i-1})] + err(0(h^3))
